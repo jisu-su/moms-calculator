@@ -1,0 +1,37 @@
+{
+  "expo": {
+    "name": "엄마의 월급 계산기",
+    "slug": "moms-calculator",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#EDE9F6"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#EDE9F6"
+      },
+      "package": "com.momsapp.calculator"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#7C5CBF"
+        }
+      ]
+    ],
+    "scheme": "moms-calculator",
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
