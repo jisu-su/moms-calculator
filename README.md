@@ -91,3 +91,27 @@ payHistory/       월급 지급 이력
 - 모든 문서는 `createdAt`, `updatedAt` 필드를 갖는다.
 - `employeeId`는 employees 문서의 ID를 참조한다.
 
+---
+
+## Hooks 요약
+
+화면에서 Firestore를 직접 호출하지 않고, 아래 훅을 통해 접근한다.
+
+### `useEmployees`
+
+- 알바생 목록/추가/수정/삭제 관리
+- 삭제 시 `workLogs`, `payHistory`까지 연동 삭제
+- 반환값: `employees`, `loading`, `error`, `refetch` + CRUD 함수
+
+### `useWorkLogs`
+
+- 특정 알바생 근무 기록 목록 관리
+- 기간/날짜 조회 헬퍼 제공
+- 반환값: `workLogs`, `loading`, `error`, `refetch` + CRUD/조회 함수
+
+### `usePayCalc`
+
+- startDate 기준 정산 기간 계산
+- 총 근무 시간 합산 + 월급 계산
+- 반환값: `periodStart`, `periodEnd`, `totalHours`, `totalPay`, `loading`, `error`, `refetch`
+
