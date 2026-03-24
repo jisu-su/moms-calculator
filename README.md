@@ -91,3 +91,46 @@ payHistory/       월급 지급 이력
 - 모든 문서는 `createdAt`, `updatedAt` 필드를 갖는다.
 - `employeeId`는 employees 문서의 ID를 참조한다.
 
+---
+
+## Firebase Auth + Firestore Rules (가족 전용)
+
+### Auth 방식
+
+- 이메일/비밀번호 로그인 사용
+- 가족 3명 계정만 생성
+
+### 환경변수 설정
+
+- `.env.example`를 참고해 `.env` 파일을 만든다.
+- `EXPO_PUBLIC_` 접두어를 붙인 값은 Expo 앱에서 바로 읽을 수 있다.
+
+### Firestore Rules 예시
+
+아래는 **허용된 UID만 읽기/쓰기** 가능한 규칙 예시다.  
+실제 UID는 Firebase 콘솔에서 확인해 넣는다.
+
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 가족 UID만 접근 허용
+    function isFamily() {
+      return request.auth != null
+        && request.auth.uid in [
+          "UID_MOM",
+          "UID_DAD",
+          "UID_ME"
+        ];
+    }
+
+    match /{document=**} {
+      allow read, write: if isFamily();
+    }
+  }
+}
+```
+
+### 코드 위치
+
+- Firebase 초기화: `C:\Users\dup04\Desktop\개인 작업\moms-calculator\lib\firebase.ts`
