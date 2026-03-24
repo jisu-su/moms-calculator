@@ -8,7 +8,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import type { WorkLog } from "../db/schema";
+import type { Employee, WorkLog } from "../db/schema";
 import { getEmployee } from "../db/employees";
 import { getWorkLogsByPeriod } from "../db/workLogs";
 import { calcPay } from "../utils/payCalc";
