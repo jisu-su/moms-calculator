@@ -34,7 +34,19 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(true);
+  const [showSplash, setShowSplash] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // -----------------------------------------------------------
+  // 스플래시 화면 1.5초 표시
+  // -----------------------------------------------------------
+  useEffect(() => {
+    const splashTimer = setTimeout(() => {
+      setShowSplash(false);
+    }, 1500);
+
+    return () => clearTimeout(splashTimer);
+  }, []);
 
   // -----------------------------------------------------------
   // 로그인 상태 확인 + 자동 로그인 방지 (메모리 저장)
@@ -79,11 +91,18 @@ export default function LoginScreen() {
     }
   };
 
-  // 로그인 상태 확인 중에는 로딩 화면만 표시
-  if (checking) {
+  // 스플래시 화면 표시
+  if (showSplash || checking) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator color={colors.primary} />
+      <View style={styles.splashScreen}>
+        <View style={styles.splashContent}>
+          <Text style={styles.splashGreeting}>오늘도 고생했어</Text>
+          <Text style={styles.splashTitle}>엄마만의</Text>
+          <Text style={styles.splashTitle}>월급 계산기</Text>
+        </View>
+        {checking && (
+          <ActivityIndicator color={colors.white} style={styles.splashLoader} />
+        )}
       </View>
     );
   }
@@ -147,11 +166,30 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 20,
   },
-  center: {
+  splashScreen: {
     flex: 1,
+    backgroundColor: colors.primary,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: colors.background,
+  },
+  splashContent: {
+    alignItems: "center",
+  },
+  splashGreeting: {
+    fontSize: typography.sizes.body,
+    color: colors.white,
+    opacity: 0.9,
+    marginBottom: 12,
+  },
+  splashTitle: {
+    fontSize: 32,
+    fontWeight: "700",
+    color: colors.white,
+    lineHeight: 42,
+  },
+  splashLoader: {
+    position: "absolute",
+    bottom: 60,
   },
   card: {
     backgroundColor: colors.white,
