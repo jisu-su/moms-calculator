@@ -8,7 +8,6 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   FlatList,
-  Pressable,
   StyleSheet,
   Text,
   View,
@@ -105,6 +104,7 @@ export default function CalendarScreen() {
         month={month}
         dotCounts={dotCounts}
         selectedDate={selectedDate}
+        onSelectDate={handleSelectDate}
       />
 
       <Text style={styles.subTitle}>
@@ -173,26 +173,5 @@ const styles = StyleSheet.create({
   emptyText: {
     color: colors.textSecondary,
     fontSize: typography.sizes.body,
-  },
-  quickGrid: {
-    marginTop: 12,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 6,
-  },
-  dayButton: {
-    width: 40,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: colors.inputFilled,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  dayButtonSelected: {
-    backgroundColor: colors.primary,
-  },
-  dayButtonText: {
-    fontSize: 12,
-    color: colors.text,
   },
 });
