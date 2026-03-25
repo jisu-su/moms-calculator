@@ -5,7 +5,7 @@
  * - 날짜 선택 시 해당일 근무한 알바생 목록 표시
  */
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   FlatList,
   Pressable,
@@ -19,12 +19,13 @@ import { typography } from "../../constants/typography";
 import { useEmployees } from "../../hooks/useEmployees";
 import { useWorkLogs } from "../../hooks/useWorkLogs";
 import { CalendarDotView } from "../../components/CalendarDotView";
+import { getDaysInMonth } from "../../utils/dateUtils";
 
 export default function CalendarScreen() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   const { employees } = useEmployees();
-  const { getLogsByDate } = useWorkLogs();
+  const { getLogsByDate, getLogsByPeriod } = useWorkLogs();
 
   const today = new Date();
   const year = today.getFullYear();
@@ -33,12 +34,52 @@ export default function CalendarScreen() {
   // ---------------------------------------------------------
   // 근무 날짜별 점 개수 계산 (근무자 수)
   // ---------------------------------------------------------
-  const dotCounts = useMemo(() => {
-    const counts: Record<string, number> = {};
-    // 알바생이 많지 않다는 전제에서 간단 집계
-    // (추후 workLogs 전체를 캐시하거나 서버 집계로 개선 가능)
-    return counts;
-  }, []);
+  const datesInMonth = useMemo(() => getDaysInMonth(year, month), [year, month]);
+
+  const [dotCounts, setDotCounts] = useState<Record<string, number>>({});
+
+  // ---------------------------------------------------------
+  // 월별 근무자 수 집계 (가족 2~3명 기준의 간단 집계)
+  // ---------------------------------------------------------
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadCounts = async () => {
+      // 기본값 0으로 초기화
+      const base: Record<string, number> = {};
+      datesInMonth.forEach((d) => {
+        base[d] = 0;
+      });
+
+      // 알바생이 없으면 바로 종료
+      if (employees.length === 0) {
+        if (isMounted) setDotCounts(base);
+        return;
+      }
+
+      // 이번 달 기간 계산 (YYYY-MM-01 ~ 마지막 날)
+      const monthStart = datesInMonth[0];
+      const monthEnd = datesInMonth[datesInMonth.length - 1];
+
+      // 알바생별 근무 기록을 가져와 날짜별로 집계
+      // - 가족 규모에서만 쓰는 단순한 방식
+      const allLogs = await Promise.all(
+        employees.map((e) => getLogsByPeriod(e.id, monthStart, monthEnd))
+      );
+
+      allLogs.flat().forEach((log) => {
+        base[log.date] = (base[log.date] ?? 0) + 1;
+      });
+
+      if (isMounted) setDotCounts(base);
+    };
+
+    void loadCounts();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [employees, datesInMonth, getLogsByPeriod]);
 
   // ---------------------------------------------------------
   // 선택 날짜의 근무자 목록 조회
@@ -85,9 +126,8 @@ export default function CalendarScreen() {
 
       {/* 날짜 선택을 위한 간단한 버튼 (현재 월 전체) */}
       <View style={styles.quickGrid}>
-        {Array.from({ length: 31 }).map((_, i) => {
-          const day = i + 1;
-          const date = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+        {datesInMonth.map((date) => {
+          const day = Number(date.split("-")[2]);
           return (
             <Pressable
               key={date}
