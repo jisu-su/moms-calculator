@@ -17,13 +17,6 @@ import {
   View,
 } from "react-native";
 import { router } from "expo-router";
-import {
-  inMemoryPersistence,
-  onAuthStateChanged,
-  setPersistence,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
-
 import { auth } from "../lib/firebase";
 import { colors } from "../constants/colors";
 import { typography } from "../constants/typography";
@@ -40,14 +33,8 @@ export default function LoginScreen() {
   // 로그인 상태 확인 + 자동 로그인 방지 (메모리 저장)
   // -----------------------------------------------------------
   useEffect(() => {
-    // 자동 로그인(영구 저장)을 막기 위해 inMemoryPersistence 사용
-    // 앱을 완전히 종료하면 다시 로그인 필요
-    setPersistence(auth, inMemoryPersistence).catch(() => {
-      // 실패해도 앱 실행은 계속 가능하므로 에러는 무시
-    });
-
     // 로그인 상태가 이미 있으면 바로 홈으로 이동
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         router.replace("/(tabs)/home");
       }
@@ -70,7 +57,7 @@ export default function LoginScreen() {
     setError(null);
 
     try {
-      await signInWithEmailAndPassword(auth, email.trim(), password);
+      await auth.signInWithEmailAndPassword(email.trim(), password);
       router.replace("/(tabs)/home");
     } catch (e) {
       setError("로그인에 실패했습니다. 이메일/비밀번호를 확인해주세요.");
