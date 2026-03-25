@@ -123,22 +123,6 @@ export default function CalendarScreen() {
           <Text style={styles.emptyText}>근무자가 없습니다.</Text>
         }
       />
-
-      {/* 날짜 선택을 위한 간단한 버튼 (현재 월 전체) */}
-      <View style={styles.quickGrid}>
-        {datesInMonth.map((date) => {
-          const day = Number(date.split("-")[2]);
-          return (
-            <Pressable
-              key={date}
-              style={[styles.dayButton, selectedDate === date && styles.dayButtonSelected]}
-              onPress={() => handleSelectDate(date)}
-            >
-              <Text style={styles.dayButtonText}>{day}</Text>
-            </Pressable>
-          );
-        })}
-      </View>
     </View>
   );
 }
