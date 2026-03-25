@@ -3,7 +3,7 @@
  * 달력 화면에서 월별 날짜와 근무 점을 표시하는 컴포넌트
  */
 
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { colors } from "../constants/colors";
 import { typography } from "../constants/typography";
@@ -14,10 +14,11 @@ type CalendarDotViewProps = {
   month: number; // 1~12
   dotCounts: Record<string, number>; // key: "YYYY-MM-DD", value: 근무자 수
   selectedDate?: string | null;
+  onSelectDate?: (date: string) => void;
 };
 
 export function CalendarDotView(props: CalendarDotViewProps) {
-  const { year, month, dotCounts, selectedDate } = props;
+  const { year, month, dotCounts, selectedDate, onSelectDate } = props;
   const days = getDaysInMonth(year, month);
 
   return (
@@ -30,7 +31,11 @@ export function CalendarDotView(props: CalendarDotViewProps) {
           const isSelected = selectedDate === date;
 
           return (
-            <View key={date} style={[styles.cell, isSelected && styles.selectedCell]}>
+            <Pressable
+              key={date}
+              style={[styles.cell, isSelected && styles.selectedCell]}
+              onPress={() => onSelectDate?.(date)}
+            >
               <Text style={[styles.dayText, isSelected && styles.selectedText]}>
                 {d}
               </Text>
@@ -39,7 +44,7 @@ export function CalendarDotView(props: CalendarDotViewProps) {
                   <View key={i} style={styles.dot} />
                 ))}
               </View>
-            </View>
+            </Pressable>
           );
         })}
       </View>

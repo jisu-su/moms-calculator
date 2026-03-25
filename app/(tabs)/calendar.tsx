@@ -8,7 +8,6 @@
 import { useMemo, useState } from "react";
 import {
   FlatList,
-  Pressable,
   StyleSheet,
   Text,
   View,
@@ -64,6 +63,7 @@ export default function CalendarScreen() {
         month={month}
         dotCounts={dotCounts}
         selectedDate={selectedDate}
+        onSelectDate={handleSelectDate}
       />
 
       <Text style={styles.subTitle}>
@@ -83,22 +83,6 @@ export default function CalendarScreen() {
         }
       />
 
-      {/* 날짜 선택을 위한 간단한 버튼 (현재 월 전체) */}
-      <View style={styles.quickGrid}>
-        {Array.from({ length: 31 }).map((_, i) => {
-          const day = i + 1;
-          const date = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-          return (
-            <Pressable
-              key={date}
-              style={[styles.dayButton, selectedDate === date && styles.dayButtonSelected]}
-              onPress={() => handleSelectDate(date)}
-            >
-              <Text style={styles.dayButtonText}>{day}</Text>
-            </Pressable>
-          );
-        })}
-      </View>
     </View>
   );
 }
@@ -133,26 +117,5 @@ const styles = StyleSheet.create({
   emptyText: {
     color: colors.textSecondary,
     fontSize: typography.sizes.body,
-  },
-  quickGrid: {
-    marginTop: 12,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 6,
-  },
-  dayButton: {
-    width: 40,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: colors.inputFilled,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  dayButtonSelected: {
-    backgroundColor: colors.primary,
-  },
-  dayButtonText: {
-    fontSize: 12,
-    color: colors.text,
   },
 });
