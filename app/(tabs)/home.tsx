@@ -1,8 +1,8 @@
 /**
  * app/(tabs)/home.tsx
  * 홈 화면 — 알바생 목록
- * - 알바생 카드 목록 표시
- * - 알바생 추가 / 근무 입력으로 이동 버튼 제공
+ * - 알바생 카드 목록 표시 (월급날 빠른 순 정렬)
+ * - 우측 상단 알바생 추가 버튼
  */
 
 import { useCallback } from "react";
@@ -16,6 +16,7 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
 
 import { colors } from "../../constants/colors";
 import { typography } from "../../constants/typography";
@@ -25,6 +26,9 @@ import { EmployeeCard } from "../../components/EmployeeCard";
 
 export default function HomeScreen() {
   const { employees, loading, error, refetch } = useEmployees();
+
+  // 월급날 빠른 순 정렬
+  const sortedEmployees = [...employees].sort((a, b) => a.payDay - b.payDay);
 
   // ---------------------------------------------------------
   // 카드 클릭 시 상세 화면으로 이동
@@ -40,19 +44,16 @@ export default function HomeScreen() {
     router.push("/employee/new");
   }, []);
 
-  // ---------------------------------------------------------
-  // 근무 입력 화면으로 이동
-  // ---------------------------------------------------------
-  const handleAddWorkLog = useCallback(() => {
-    router.push("/worklog/new");
-  }, []);
-
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <View style={styles.header}>
-        <Text style={styles.title}>알바생 목록</Text>
-        <Pressable style={styles.headerButton} onPress={refetch}>
-          <Text style={styles.headerButtonText}>새로고침</Text>
+        <View>
+          <Text style={styles.subtitle}>알바생 목록</Text>
+          <Text style={styles.title}>총 {employees.length}명</Text>
+        </View>
+        <Pressable style={styles.addButton} onPress={handleAddEmployee}>
+          <Ionicons name="person-add-outline" size={20} color={colors.white} />
+          <Text style={styles.addButtonText}>추가</Text>
         </Pressable>
       </View>
 
@@ -65,14 +66,18 @@ export default function HomeScreen() {
       {!loading && error && (
         <View style={styles.center}>
           <Text style={styles.error}>{error}</Text>
+          <Pressable style={styles.retryButton} onPress={refetch}>
+            <Text style={styles.retryText}>다시 시도</Text>
+          </Pressable>
         </View>
       )}
 
       {!loading && !error && (
         <FlatList
-          data={employees}
+          data={sortedEmployees}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.list}
+          showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (
             <EmployeeCard
               id={item.id}
@@ -84,25 +89,21 @@ export default function HomeScreen() {
           )}
           ListEmptyComponent={
             <View style={styles.empty}>
+              <Ionicons
+                name="people-outline"
+                size={64}
+                color={colors.textSecondary}
+              />
               <Text style={styles.emptyText}>
                 아직 등록된 알바생이 없습니다.
               </Text>
               <Text style={styles.emptySubText}>
-                아래 버튼을 눌러 알바생을 추가해 주세요.
+                우측 상단의 추가 버튼을 눌러{"\n"}알바생을 등록해 주세요.
               </Text>
             </View>
           }
         />
       )}
-
-      <View style={styles.fabContainer}>
-        <Pressable style={styles.fabSecondary} onPress={handleAddWorkLog}>
-          <Text style={styles.fabText}>근무 입력</Text>
-        </Pressable>
-        <Pressable style={styles.fabPrimary} onPress={handleAddEmployee}>
-          <Text style={styles.fabText}>알바생 추가</Text>
-        </Pressable>
-      </View>
     </SafeAreaView>
   );
 }
@@ -113,31 +114,41 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   header: {
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 8,
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 12,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+  },
+  subtitle: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    marginBottom: 2,
   },
   title: {
     fontSize: typography.sizes.heading,
     fontWeight: "700",
     color: colors.text,
   },
-  headerButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+  addButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: colors.primary,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
     borderRadius: 12,
-    backgroundColor: colors.inputFilled,
+    gap: 6,
+    minHeight: defaults.minTouchSize,
   },
-  headerButtonText: {
+  addButtonText: {
     fontSize: typography.sizes.body,
-    color: colors.textSecondary,
+    color: colors.white,
+    fontWeight: "600",
   },
   list: {
-    paddingHorizontal: 16,
-    paddingBottom: 120,
+    paddingHorizontal: 20,
+    paddingBottom: 100,
   },
   center: {
     flex: 1,
@@ -147,46 +158,33 @@ const styles = StyleSheet.create({
   error: {
     color: colors.error,
     fontSize: typography.sizes.body,
+    marginBottom: 12,
+  },
+  retryButton: {
+    backgroundColor: colors.inputFilled,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  retryText: {
+    color: colors.textSecondary,
+    fontSize: typography.sizes.body,
   },
   empty: {
     alignItems: "center",
-    marginTop: 32,
+    marginTop: 60,
+    paddingHorizontal: 20,
   },
   emptyText: {
     fontSize: typography.sizes.body,
     color: colors.text,
-    marginBottom: 6,
+    marginTop: 16,
+    marginBottom: 8,
   },
   emptySubText: {
-    fontSize: typography.sizes.body,
+    fontSize: 16,
     color: colors.textSecondary,
-  },
-  fabContainer: {
-    position: "absolute",
-    right: 16,
-    bottom: 20,
-    flexDirection: "column",
-    gap: 10,
-  },
-  fabPrimary: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: 18,
-    paddingVertical: 14,
-    borderRadius: 24,
-    minHeight: defaults.minTouchSize,
-    alignItems: "center",
-  },
-  fabSecondary: {
-    backgroundColor: colors.accent,
-    paddingHorizontal: 18,
-    paddingVertical: 14,
-    borderRadius: 24,
-    minHeight: defaults.minTouchSize,
-    alignItems: "center",
-  },
-  fabText: {
-    color: colors.white,
-    fontSize: typography.sizes.button,
-    fontWeight: "700",
+    textAlign: "center",
+    lineHeight: 24,
   },
 });
