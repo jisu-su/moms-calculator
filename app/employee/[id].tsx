@@ -33,7 +33,7 @@ export default function EmployeeDetailScreen() {
   const { workLogs } = useWorkLogs(id);
   const { periodStart, periodEnd, totalHours, totalPay } = usePayCalc({
     employeeId: id,
-  });
+  }); 
 
   const [name, setName] = useState("");
   const [accountHint, setAccountHint] = useState("");
