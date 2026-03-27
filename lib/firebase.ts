@@ -14,6 +14,16 @@ const firebaseConfig = {
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID ?? "",
 };
 
+const requiredKeys = ["apiKey", "authDomain", "projectId", "appId"] as const;
+const missingKeys = requiredKeys.filter((key) => !firebaseConfig[key]);
+if (missingKeys.length > 0) {
+  throw new Error(
+    `Missing Firebase config: ${missingKeys.join(
+      ", "
+    )}. Check your .env file (EXPO_PUBLIC_FIREBASE_*)`
+  );
+}
+
 // 앱이 여러 번 초기화되지 않도록 가드한다.
 const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
