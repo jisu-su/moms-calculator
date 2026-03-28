@@ -13,7 +13,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundColor": "#EDE9F6"
       },
       "package": "com.momsapp.calculator"
@@ -31,7 +31,7 @@
     ],
     "scheme": "moms-calculator",
     "experiments": {
-      "typedRoutes": true
+      "typedRoutes": false
     }
   }
 }

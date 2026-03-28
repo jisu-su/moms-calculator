@@ -57,7 +57,7 @@ export function ClockPicker(props: ClockPickerProps) {
 
   const handleClockPress = (event: any) => {
     const { locationX, locationY } = event.nativeEvent;
-    
+
     // 중심에서의 각도 계산
     const dx = locationX - centerX;
     const dy = locationY - centerY;
@@ -68,7 +68,7 @@ export function ClockPicker(props: ClockPickerProps) {
       // 시간 선택 (0-23)
       let hour = Math.round((angle / (2 * Math.PI)) * 12);
       if (hour === 0) hour = 12;
-      
+
       // 오전/오후 유지
       const newHour = hours >= 12 ? (hour === 12 ? 12 : hour + 12) : (hour === 12 ? 0 : hour);
       const formatted = `${String(newHour).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
